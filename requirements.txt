@@ -1,0 +1,15 @@
+gradio
+PyMuPDF
+Pillow
+requests
+agno==2.5.17
+openai
+lancedb
+duckduckgo-search
+ddgs
+pypdf
+pyarrow
+tiktoken
+numpy
+tantivy
+pylance
