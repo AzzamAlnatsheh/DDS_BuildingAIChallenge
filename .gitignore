@@ -1,0 +1,21 @@
+# Python
+__pycache__/
+*.py[cod]
+*.so
+.Python
+
+# Virtual Environment
+venv/
+env/
+ENV/
+
+# Project specific
+pdf_cache/
+tmp/
+*.db
+*.lance
+.env
+
+# OS files
+.DS_Store
+Thumbs.db
