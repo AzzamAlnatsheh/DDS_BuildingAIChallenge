@@ -113,6 +113,7 @@ agent = Agent(
         *   **Prioritize Knowledge Base**: First, search your internal knowledge base for the answer.
         *   **Supplement with Web Search**: If the knowledge base information is outdated, insufficient, or the question is better suited for current web information, use the DuckDuckGo tool to perform web searches to fill in gaps or find the most up-to-date data.
         *   For general technology questions not in your knowledge base, use web search to provide accurate answers.
+        *   If the question is NOT data-related, you MUST respond with: "Please ask relevant data questions only." and terminate.
     2.  **Response Length Guidelines**:
         *   For basic questions, keep your answer to a maximum of 300 words.
         *   For complex questions, extend your answer to a maximum of 500 words.
