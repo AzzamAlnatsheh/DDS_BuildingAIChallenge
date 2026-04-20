@@ -184,7 +184,7 @@ def display_pdf(pdf_url):
         doc = fitz.open(stream=pdf_bytes, filetype="pdf")
         page = doc[0]
         
-        zoom = 2
+        zoom = 1.5
         mat = fitz.Matrix(zoom, zoom)
         pix = page.get_pixmap(matrix=mat)
         
@@ -248,7 +248,7 @@ with gr.Blocks(title="# 🌊 Dox the Data Professional's Advisor 🤖", theme=gr
                 elem_id="answer_markdown"
             )
             
-        with gr.Column(scale=1):
+        with gr.Column(scale=2):
             link_state = gr.State()
             show_btn = gr.Button("Show PDF", visible=False, variant="secondary")
             output_image = gr.Image(label="PDF Preview (Page 1)", visible=False)
