@@ -1,4 +1,4 @@
-# 🌊 Dox - The Data Professional's AI Advisor
+# 🤖 Dox - The Data Professional's AI Advisor
 
 [![Hugging Face Spaces](https://img.shields.io/badge/🤗-Live%20Demo-blue)](https://huggingface.co/spaces/AzzamAlnatsheh/BuildingAIChallenge)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
