@@ -49,7 +49,9 @@ pdf_urls = [
     "https://media.datacamp.com/cms/working-with-hugging-face.pdf",
     "https://media.datacamp.com/cms/ai-agents-cheat-sheet.pdf",
     "https://media.datacamp.com/cms/introduction-to-sql-with-ai-1.pdf",
-    "https://media.datacamp.com/legacy/image/upload/v1719844709/Marketing/Blog/Azure_CLI_Cheat_Sheet.pdf"
+    "https://media.datacamp.com/legacy/image/upload/v1719844709/Marketing/Blog/Azure_CLI_Cheat_Sheet.pdf",
+    "https://s3.amazonaws.com/assets.datacamp.com/email/other/Power+BI_Cheat+Sheet.pdf",
+    "https://media.datacamp.com/cms/python-basics-cheat-sheet-v4.pdf"
 ]
 
 # Defines a function to download a file from a URL if it doesn't already exist locally.
@@ -178,10 +180,14 @@ logger.info("🟢 Agent initialized successfully!")
 # Defines a function to process a user's question.
 def ask_agent(question):
     logger.info(f"Question asked: {question[:100]}...")
-    # Run the agent with the user's question, ensuring it uses its knowledge base.
-    response = agent.run(question, use_knowledge=True)
-    # Get the agent's response as a single string.
-    full_content = response.get_content_as_string()
+    try:
+        # Run the agent with the user's question, ensuring it uses its knowledge base.
+        response = agent.run(question, use_knowledge=True)
+        # Get the agent's response as a single string.
+        full_content = response.get_content_as_string()
+    except Exception as e:
+        logger.error(str(e))
+        return "❌ Something went wrong. Please try again.", None
     # Use a regular expression to find the first URL ending in '.pdf' in the response.
     match = re.search(r'https?://[^\s]+\.pdf', full_content, re.IGNORECASE)
     # Extract the link if a match is found, otherwise set it to None.
@@ -192,6 +198,8 @@ def ask_agent(question):
     else:
         logger.info("🔴 No PDF link found in response")
     # Return the full text response and the extracted PDF link.
+    # full_content += "\n\n---\n**🔍 Try asking:**\n- Give me a real example...\n- Explain step by step...\n- Compare with alternatives..."
+    full_content += "\n\n---\n**📋 Dox would appreciate your feedback! ⬇️**"
     return full_content, link
 
 # Defines a function to download the raw content of a PDF from a URL.
@@ -209,7 +217,7 @@ def prepare_pdf_loading(link):
     if link:
         return gr.update(value="📄 Loading PDF preview...", visible=True)
     # Otherwise, hide the message.
-    return gr.update(value="", visible=False)
+    return gr.update(value="❌ No PDF for preview", visible=True)
 
 # Defines a function to display the first page of a PDF as an image.
 def display_pdf(pdf_url):
@@ -226,8 +234,9 @@ def display_pdf(pdf_url):
         doc = fitz.open(stream=pdf_bytes, filetype="pdf")
         # Get the first page of the document.
         page = doc[0]
-        # Create a transformation matrix to render the page at a higher resolution (5x zoom).
-        mat = fitz.Matrix(5, 5)
+        # Create a transformation matrix to render the page at a higher resolution.
+        zoom = 1.5
+        mat = fitz.Matrix(zoom, zoom)
         # Get a pixmap (a raster image) of the page.
         pix = page.get_pixmap(matrix=mat)
         # Convert the pixmap to a PNG image using PIL.
@@ -247,21 +256,46 @@ def display_pdf(pdf_url):
             gr.update(value="❌ Failed to load PDF", visible=True)
         )
 
-# Define a custom theme for the Gradio interface.
 theme = gr.themes.Ocean(
-    font=[gr.themes.GoogleFont("Quicksand"), "sans-serif"],
-    font_mono=[gr.themes.GoogleFont("Fira Code"), "monospace"],
+    font=[gr.themes.GoogleFont("Inter"), "Segoe UI", "sans-serif"],
+    font_mono=[gr.themes.GoogleFont("Fira Code"), "monospace"]
 )
+
+demo_css = """
+.chatbot {
+    font-family: 'Inter', 'Segoe UI', sans-serif !important;
+    font-size: 12px !important;
+}
+
+.chatbot .message code,
+.chatbot .message pre {
+    font-size: 12px !important;
+    font-family: 'Inter', 'Segoe UI', sans-serif !important;
+}
+
+.component {
+    font-family: 'Inter', 'Segoe UI', sans-serif !important;
+    font-size: 12px !important;
+}
+
+.gradio-container .examples {
+    font-family: 'Inter', 'Segoe UI', sans-serif !important;
+    font-size: 12px !important;
+}
+"""
 
 # Create the Gradio interface using `gr.Blocks` for a custom layout.
 with gr.Blocks(
     title="# 🤖 Dox the Data Professional's Advisor 🤖",
-    theme=theme
+    theme=theme,
+    css=demo_css,
+    fill_width=True
 ) as demo:
     # Add titles and descriptions using Markdown.
     gr.Markdown("# 🤖 Dox the Data Professional's Advisor 🤖")
-    gr.Markdown("### 🧠 Dox knows about 4 DataCamp cheat sheets: (1️⃣ Hugging Face | 2️⃣ AI Agents | 3️⃣ SQL with AI | 4️⃣ Azure CLI):")
-    
+    gr.Markdown("### 🧠 Dox is an expert in the following topics: \n1️⃣ Hugging Face | 2️⃣ AI Agents | 3️⃣ SQL with AI | 4️⃣ Azure CLI | 5️⃣ Power BI | 6️⃣ Python")
+    def run_example(question_text, chat_history):
+        return chat_ui(question_text, chat_history)
     # Create a main row for the layout.
     with gr.Row():
         # LEFT-SIDE COLUMN: for the chat interface.
@@ -274,35 +308,56 @@ with gr.Blocks(
             question = gr.Textbox(
                 label="🙋 Ask Dox a question:",
                 placeholder="🤔 Type your question here...",
-                lines=1
+                lines=1, 
+                elem_classes="component"
             )
             # The submit button.
-            ask_btn = gr.Button("Submit 📤", variant="primary")
+            #ask_btn = gr.Button("Submit 📤", variant="primary")
+            with gr.Row():
+                ask_btn = gr.Button("Submit 📤", variant="primary", elem_classes="component")
+                clear_btn = gr.Button("🧹 Clear Chat", elem_classes="component")
             # A section for example questions.
-            gr.Markdown("### 💡 Example Questions")
-            gr.Examples(
+            gr.Markdown("### 💡 Example Questions", elem_classes="component")
+            examples = gr.Examples(
                 examples=[
                     "How do you log into Azure using device code authentication?",
                     "What are the three main components of an AI agent?",
                     "What are the \"core four\" Hugging Face libraries?",
                     "What SQL clause is used to filter data after grouping?",
-                    "How to use \"HAVING\" clause in SQL?",
                     "What is the latest GPT model?"
                 ],
                 inputs=question,
+                outputs=[chatbot, question],
+                fn=run_example,
+                cache_examples=False
             )
+            # 👍👎 Feedback buttons
+            with gr.Row():
+                thumbs_up = gr.Button("👍 Helpful", elem_classes="component")
+                thumbs_down = gr.Button("👎 Not Helpful", elem_classes="component")
+             
+            # Hidden feedback box (only appears on 👎)
+            feedback_box = gr.Textbox(
+                placeholder="💬 Optional: tell us what went wrong...",
+                visible=False
+            )
+             
+            submit_feedback_btn = gr.Button("📝 Submit Feedback", visible=False, elem_classes="component")
+            feedback_status = gr.Markdown("", elem_classes="component")
         # RIGHT-SIDE COLUMN: for the PDF preview.
-        with gr.Column(scale=2):
-            gr.Markdown("### 📄 Referenced PDF Document")
+        with gr.Column(scale=3):
+            gr.Markdown("### 📄 Referenced PDF Document (🌐 Empty for Web Results)", elem_classes="component")
+            #gr.Markdown(" 🌐 Empty by default", elem_classes="component")
             # A hidden state to store the PDF link found in the agent's response.
             link_state = gr.State()
             # A markdown component to show PDF loading status.
-            pdf_status = gr.Markdown(visible=False)
+            pdf_status = gr.Markdown(visible=False, elem_classes="component")
             # An image component to display the PDF preview.
             output_image = gr.Image(
                 label="⬇️ Cheat Sheet Preview",
                 visible=False
             )
+            pdf_link_btn = gr.Markdown("")
 
     # Defines the main chat logic as a generator function for streaming output.
     def chat_ui(user_message, chat_history):
@@ -319,7 +374,7 @@ with gr.Blocks(
         # Append a temporary "Thinking..." message from the assistant.
         chat_history.append({
             "role": "assistant",
-            "content": "🤔 Thinking..."
+            "content": "🤔 Dox is thinking..."
         })
     
         # `yield` immediately updates the UI with the user's message and "Thinking...".
@@ -359,6 +414,62 @@ with gr.Blocks(
             [chatbot, link_state, output_image, question]
         )
 
+    def show_pdf_link(link):
+        if link:
+            return f"[📥 Open Full PDF]({link})"
+        return ""
+
+    def clear_chat():
+        return [], None, gr.update(value=None, visible=False), gr.update(value=None, visible=False), gr.update(value=None, visible=False)
+
+    clear_btn.click(
+        clear_chat,
+        outputs=[chatbot, link_state, output_image, feedback_box, submit_feedback_btn]
+    )
+
+    def show_feedback_box():
+        return gr.update(visible=True), gr.update(visible=True)
+
+    def show_appreciation():
+        logger.info("It was helpful!")
+        return "✅ Feedback submitted. Thank you!"
+     
+    thumbs_down.click(
+        show_feedback_box,
+        outputs=[feedback_box, submit_feedback_btn]
+    )
+
+    thumbs_up.click(
+        show_appreciation,
+        outputs=feedback_status
+    )
+
+    def handle_feedback(text):
+        logger.info(f"User feedback: {text}")
+        return "✅ Feedback submitted. Thank you!"
+     
+    submit_feedback_btn.click(
+        handle_feedback,
+        inputs=feedback_box,
+        outputs=feedback_status
+    )
+
+    examples.dataset.click(
+        *submit_chain()
+    ).then(
+        prepare_pdf_loading,
+        inputs=link_state,
+        outputs=pdf_status
+    ).then(
+        display_pdf,
+        inputs=link_state,
+        outputs=[output_image, pdf_status]
+    ).then(
+        show_pdf_link,
+        inputs=link_state,
+        outputs=pdf_link_btn
+    )
+
     # Set up the event handler for the "Submit" button click.
     ask_btn.click(
         *submit_chain()
@@ -373,6 +484,10 @@ with gr.Blocks(
         display_pdf,
         inputs=link_state, # Use the same link.
         outputs=[output_image, pdf_status] # Update the image and hide the status text.
+    ).then(
+        show_pdf_link,
+        inputs=link_state,
+        outputs=pdf_link_btn
     )
     
     # Set up the same event handler for when the user presses Enter in the textbox.
@@ -386,6 +501,10 @@ with gr.Blocks(
         display_pdf,
         inputs=link_state,
         outputs=[output_image, pdf_status]
+    ).then(
+        show_pdf_link,
+        inputs=link_state,
+        outputs=pdf_link_btn
     )
 
 # This block ensures the code inside only runs when the script is executed directly.
