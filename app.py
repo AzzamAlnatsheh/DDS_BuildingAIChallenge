@@ -264,23 +264,23 @@ theme = gr.themes.Ocean(
 demo_css = """
 .chatbot {
     font-family: 'Inter', 'Segoe UI', sans-serif !important;
-    font-size: 12px !important;
+    font-size: 13px !important;
 }
 
 .chatbot .message code,
 .chatbot .message pre {
-    font-size: 12px !important;
+    font-size: 13px !important;
     font-family: 'Inter', 'Segoe UI', sans-serif !important;
 }
 
 .component {
     font-family: 'Inter', 'Segoe UI', sans-serif !important;
-    font-size: 12px !important;
+    font-size: 13px !important;
 }
 
 .gradio-container .examples {
     font-family: 'Inter', 'Segoe UI', sans-serif !important;
-    font-size: 12px !important;
+    font-size: 13px !important;
 }
 """
 
