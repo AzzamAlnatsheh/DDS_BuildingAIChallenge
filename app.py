@@ -54,6 +54,28 @@ pdf_urls = [
     "https://media.datacamp.com/cms/python-basics-cheat-sheet-v4.pdf"
 ]
 
+# -----------------------------
+# Example Questions
+# -----------------------------
+example_questions=[
+    "How do you log into Azure using device code authentication?",
+    "What are the three main components of an AI agent?",
+    "What are the \"core four\" Hugging Face libraries?",
+    "What SQL clause is used to filter data after grouping?",
+    "What is the latest GPT model?"
+]
+
+# -----------------------------
+# Chat Functions
+# -----------------------------
+initial_chat = [
+    {
+        "role": "assistant",
+        "content": "Hello, I am Dox, the Data Professional's Guide. Ask me a question about data."
+    }
+]
+
+
 # Defines a function to download a file from a URL if it doesn't already exist locally.
 def download_if_needed(url, filename):
     # Check if the file path does not exist.
@@ -167,7 +189,7 @@ agent = Agent(
     # Automatically add the user's location to the context (if available).
     add_location_to_context=True,
     # Enable the agent to search its knowledge base by default.
-    search_knowledge=True,
+    #search_knowledge=True,
     # Equip the agent with tools, in this case, the ability to search the web using DuckDuckGo.
     tools=[DuckDuckGoTools()],
     # Enable markdown formatting in the agent's output.
@@ -260,104 +282,252 @@ theme = gr.themes.Ocean(
     font=[gr.themes.GoogleFont("Inter"), "Segoe UI", "sans-serif"],
     font_mono=[gr.themes.GoogleFont("Fira Code"), "monospace"]
 )
-
-demo_css = """
-.chatbot {
-    font-family: 'Inter', 'Segoe UI', sans-serif !important;
-    font-size: 13px !important;
+DOX_LOGO = "https://raw.githubusercontent.com/AzzamAlnatsheh/DDS_BuildingAIChallenge/main/Dox Transparent Image.png"
+custom_css = """
+.main-container {
+    width: 100%;
+    max-width: 100%;
+    margin: 0;
+    padding: 0 10px;
 }
 
-.chatbot .message code,
-.chatbot .message pre {
-    font-size: 13px !important;
-    font-family: 'Inter', 'Segoe UI', sans-serif !important;
+/* HEADER */
+.header-card {
+    background: linear-gradient(135deg, #0B1F3A, #102A4C);
+    border-radius: 24px;
+    padding: 0px;
+    box-shadow: 0 16px 40px rgba(2, 6, 23, 0.4);
+    border: 1px solid #1F3B5C;
+    margin: 0px;
 }
 
-.component {
-    font-family: 'Inter', 'Segoe UI', sans-serif !important;
-    font-size: 13px !important;
+/* SIDEBAR */
+.sidebar-card {
+    background: rgba(11, 31, 58, 0.95);
+    border-radius: 24px;
+    padding: 24px;
+    box-shadow: 0 16px 40px rgba(2, 6, 23, 0.35);
+    border: 1px solid #1F3B5C;
+    height: 100%;
 }
 
-.gradio-container .examples {
-    font-family: 'Inter', 'Segoe UI', sans-serif !important;
-    font-size: 13px !important;
+/* CHAT */
+.chat-card {
+    background: rgba(16, 42, 76, 0.95);
+    border-radius: 24px;
+    padding: 22px;
+    box-shadow: 0 16px 40px rgba(2, 6, 23, 0.35);
+    border: 1px solid #1F3B5C;
+}
+
+/* LOGO */
+.logo-img {
+    width: 200px;
+    height: 170px;
+    margin: 0px;
+    padding: 0px;
+}
+
+/* TITLE */
+.title-text {
+    font-size: 32px;
+    font-weight: 850;
+    color: #E6F0FA;
+    margin-bottom: 8px;
+    letter-spacing: -0.03em;
+}
+
+/* SUBTITLE */
+.subtitle-text {
+    font-size: 16px;
+    color: #AFCBE8;
+    line-height: 1.65;
+    max-width: auto;
+}
+
+/* BADGES */
+.badge {
+    display: inline-block;
+    background: rgba(30, 167, 255, 0.15);
+    color: #4FD1FF;
+    padding: 7px 13px;
+    border-radius: 999px;
+    font-size: 13px;
+    font-weight: 650;
+    margin-right: 7px;
+    margin-bottom: 8px;
+    border: 1px solid rgba(30, 167, 255, 0.3);
+}
+
+/* STATUS BOX */
+.status-box {
+    background: rgba(16, 42, 76, 0.85);
+    border: 1px solid #1F3B5C;
+    padding: 14px;
+    border-radius: 16px;
+    font-size: 14px;
+    color: #CFE6FF;
+    line-height: 1.6;
+}
+
+/* NOTES */
+.small-note {
+    font-size: 13px;
+    color: #9FB9D9;
+    line-height: 1.55;
+}
+
+.footer-note {
+    font-size: 13px;
+    color: #9FB9D9;
+    text-align: center;
+    margin-top: 18px;
+}
+
+/* CHATBOT BOX */
+#chatbot {
+    min-height: 540px;
+    border-radius: 18px;
+    border: 1px solid #1F3B5C;
+    background: rgba(11, 31, 58, 0.9);
+}
+
+/* INPUT */
+#question_box textarea {
+    border-radius: 16px !important;
+    background: #0B1F3A;
+    color: #E6F0FA;
+    border: 1px solid #1F3B5C;
+}
+
+/* EXAMPLES */
+.example-button {
+    margin-bottom: 8px !important;
+    border-radius: 14px !important;
+    white-space: normal !important;
+    text-align: left !important;
+    background: rgba(30, 167, 255, 0.08);
+    color: #CFE6FF;
+    border: 1px solid rgba(30, 167, 255, 0.2);
+}
+
+/* PRIMARY BUTTON */
+.primary-action {
+    border-radius: 14px !important;
+    background: linear-gradient(135deg, #1EA7FF, #4FD1FF) !important;
+    color: #0B1F3A !important;
+    border: none !important;
+    font-weight: 700;
+}
+
+/* CLEAR BUTTON */
+.clear-action {
+    border-radius: 14px !important;
+    background: rgba(255, 255, 255, 0.05) !important;
+    color: #E6F0FA !important;
+    border: 1px solid #1F3B5C !important;
 }
 """
 
 # Create the Gradio interface using `gr.Blocks` for a custom layout.
-with gr.Blocks(
-    title="# 🤖 Dox the Data Professional's Advisor 🤖",
-    theme=theme,
-    css=demo_css,
+with gr.Blocks(title="🤖 Dox the Data Professional's Guide 🤖",
+    #theme=theme,
+    #css=demo_css,
     fill_width=True
 ) as demo:
-    # Add titles and descriptions using Markdown.
-    gr.Markdown("# 🤖 Dox the Data Professional's Advisor 🤖")
-    gr.Markdown("### 🧠 Dox is an expert in the following topics: \n1️⃣ Hugging Face | 2️⃣ AI Agents | 3️⃣ SQL with AI | 4️⃣ Azure CLI | 5️⃣ Power BI | 6️⃣ Python")
     def run_example(question_text, chat_history):
         return chat_ui(question_text, chat_history)
-    # Create a main row for the layout.
-    with gr.Row():
-        # LEFT-SIDE COLUMN: for the chat interface.
-        with gr.Column(scale=3):
-            # The chatbot display window.
-            chatbot = gr.Chatbot(label="💬 Conversation", elem_classes="chatbot", height=450)
-            # A text area for status messages (used for PDF loading status).
-            status_text = gr.Markdown("")
-            # The textbox where the user types their question.
-            question = gr.Textbox(
-                label="🙋 Ask Dox a question:",
-                placeholder="🤔 Type your question here...",
-                lines=1, 
-                elem_classes="component"
-            )
-            # The submit button.
-            #ask_btn = gr.Button("Submit 📤", variant="primary")
-            with gr.Row():
-                ask_btn = gr.Button("Submit 📤", variant="primary", elem_classes="component")
-                clear_btn = gr.Button("🧹 Clear Chat", elem_classes="component")
-            # A section for example questions.
-            gr.Markdown("### 💡 Example Questions", elem_classes="component")
-            examples = gr.Examples(
-                examples=[
-                    "How do you log into Azure using device code authentication?",
-                    "What are the three main components of an AI agent?",
-                    "What are the \"core four\" Hugging Face libraries?",
-                    "What SQL clause is used to filter data after grouping?",
-                    "What is the latest GPT model?"
-                ],
-                inputs=question,
-                outputs=[chatbot, question],
-                fn=run_example,
-                cache_examples=False
-            )
-            # 👍👎 Feedback buttons
-            with gr.Row():
-                thumbs_up = gr.Button("👍 Helpful", elem_classes="component")
-                thumbs_down = gr.Button("👎 Not Helpful", elem_classes="component")
-             
-            # Hidden feedback box (only appears on 👎)
-            feedback_box = gr.Textbox(
-                placeholder="💬 Optional: tell us what went wrong...",
-                visible=False
-            )
-             
-            submit_feedback_btn = gr.Button("📝 Submit Feedback", visible=False, elem_classes="component")
-            feedback_status = gr.Markdown("", elem_classes="component")
-        # RIGHT-SIDE COLUMN: for the PDF preview.
-        with gr.Column(scale=3):
-            gr.Markdown("### 📄 Referenced PDF Document (🌐 Empty for Web Results)", elem_classes="component")
-            #gr.Markdown(" 🌐 Empty by default", elem_classes="component")
-            # A hidden state to store the PDF link found in the agent's response.
-            link_state = gr.State()
-            # A markdown component to show PDF loading status.
-            pdf_status = gr.Markdown(visible=False, elem_classes="component")
-            # An image component to display the PDF preview.
-            output_image = gr.Image(
-                label="⬇️ Cheat Sheet Preview",
-                visible=False
-            )
-            pdf_link_btn = gr.Markdown("")
+    with gr.Column(elem_classes=["main-container"]):
+
+        # -----------------------------
+        # Header
+        # -----------------------------
+        with gr.Row(elem_classes=["header-card"]):
+            with gr.Column(scale=1):
+                gr.HTML(
+                    f"""
+                    <img src="{DOX_LOGO}" class="logo-img" alt="DOX Logo">
+                    """
+                )
+            
+            with gr.Column(scale=5):
+                gr.HTML(
+                    """
+                    <div class="title-text">🤖 Dox the Data Professional's Advisor 🤖</div>
+                    <div class="subtitle-text">
+                        A professional data chatbot that aims in reminding and helping data experts in certain concepts in a simplified way 
+                        while also having access to download DataCamp's public cheatsheets on many data-related topics.
+                    </div>
+                    <br>
+                    <span class="badge">Agno</span>
+                    <span class="badge">LanceDB</span>
+                    <span class="badge">OpenAI</span>
+                    <span class="badge">Gradio</span>
+                    """
+                )
+        # -----------------------------
+        # Two Column Layout
+        # -----------------------------
+        with gr.Row():
+
+            # Right Chat Area
+            with gr.Column(scale=3, elem_classes=["chat-card"]):
+                gr.Markdown("### 🧠 Dox is an expert in the following topics: \n1️⃣ Hugging Face | 2️⃣ AI Agents | 3️⃣ SQL with AI | 4️⃣ Azure CLI | 5️⃣ Power BI | 6️⃣ Python")
+
+                chatbot = gr.Chatbot(
+                    label="💬 Conversation",
+                    elem_id="chatbot",
+                    value=initial_chat.copy(),
+                    height=450
+                )
+
+                question = gr.Textbox(
+                    label="🙋 Ask Dox a question:",
+                    placeholder="🤔 Type your question here...",
+                    lines=1, 
+                    elem_classes="question_box"
+                )
+
+                with gr.Row():
+                    ask_btn = gr.Button("Submit 📤", variant="primary", elem_classes="primary-action")
+                    clear_btn = gr.Button("🧹 Clear Chat", elem_classes="clear-action")
+                # A section for example questions.
+                gr.Markdown("### 💡 Example Questions", elem_classes="example-button")
+                examples = gr.Examples(
+                    examples=example_questions,
+                    inputs=question,
+                    outputs=[chatbot, question],
+                    fn=run_example,
+                    cache_examples=False
+                )
+
+                # 👍👎 Feedback buttons
+                with gr.Row():
+                    thumbs_up = gr.Button("👍 Helpful", elem_classes="clear-action")
+                    thumbs_down = gr.Button("👎 Not Helpful", elem_classes="clear-action")
+                 
+                # Hidden feedback box (only appears on 👎)
+                feedback_box = gr.Textbox(
+                    placeholder="💬 Optional: tell us what went wrong...",
+                    visible=False
+                )
+                 
+                submit_feedback_btn = gr.Button("📝 Submit Feedback", visible=False, elem_classes="clear-action")
+                feedback_status = gr.Markdown("", elem_classes="clear-action")
+            # RIGHT-SIDE COLUMN: for the PDF preview.
+            with gr.Column(scale=3):
+                gr.Markdown("### 📄 Referenced PDF Document (🌐 Empty for Web Results)", elem_classes="clear-action")
+                #gr.Markdown(" 🌐 Empty by default", elem_classes="component")
+                # A hidden state to store the PDF link found in the agent's response.
+                link_state = gr.State()
+                # A markdown component to show PDF loading status.
+                pdf_status = gr.Markdown(visible=False, elem_classes="clear-action")
+                # An image component to display the PDF preview.
+                output_image = gr.Image(
+                    label="⬇️ Cheat Sheet Preview",
+                    visible=False
+                )
+                pdf_link_btn = gr.Markdown("")
 
     # Defines the main chat logic as a generator function for streaming output.
     def chat_ui(user_message, chat_history):
@@ -509,5 +679,10 @@ with gr.Blocks(
 
 # This block ensures the code inside only runs when the script is executed directly.
 if __name__ == "__main__":
-    # Launch the Gradio web server.
-    demo.launch()
+    demo.launch(
+        theme=gr.themes.Ocean(
+            primary_hue="indigo",
+            neutral_hue="slate"
+        ),
+        css=custom_css
+    )
